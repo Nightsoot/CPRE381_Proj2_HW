@@ -127,13 +127,13 @@ architecture structure of RISCV_Processor is
   signal s_ALU_res_WB : std_logic_vector(31 downto 0);
   signal s_PC_4_WB : std_logic_vector(31 downto 0);
   signal s_PC_imm_WB : std_logic_vector(31 downto 0);
-
-
   signal s_update_ID_EX, s_flush_IF_ID_n : std_logic;
   signal s_PC_update : std_logic;
   signal s_update_IF_ID : std_logic;
 
   signal s_flush_n : std_logic;
+
+  signal s_mem_write_ID_haz, s_reg_write_ID_haz : std_logic;
 
   component mem is
     generic (
@@ -563,12 +563,10 @@ begin
   );
 
   s_rd_ID <= s_Inst(11 downto 7);
-
-
   g_hazard_detection : hazard_detector
   port map(
-    i_rs1_ID =>  s_Inst(19 downto 15),
-    i_rs2_ID =>  s_Inst(24 downto 20),
+    i_rs1_ID => s_Inst(19 downto 15),
+    i_rs2_ID => s_Inst(24 downto 20),
     i_rd_EX => s_rd_EX,
     i_reg_write_EX => s_reg_write_EX,
     i_rd_MEM => s_rd_MEM,
@@ -579,6 +577,12 @@ begin
     o_update_IF_ID => s_update_IF_ID
   );
 
+  --allow the "bad" instruction to pass through so hazards clear but
+  --prevent it from actually doing anything (nop)
+  s_mem_write_ID_haz <= s_mem_write_ID when (s_update_ID_EX = '1') else
+    '0';
+  s_reg_write_ID_haz <= s_reg_write_ID when (s_update_ID_EX = '1') else
+    '0';
   ID_EX : ID_EX_stage
   port map(
     i_CLK => iCLK,
@@ -588,15 +592,15 @@ begin
     i_ALU_src => s_ALU_src_ID, -- Signal from previous stage
     i_ALU_control => s_ALU_control_ID, -- Signal from previous stage
     i_result_src => s_result_src_ID, -- Signal from previous stage
-    i_mem_write => s_mem_write_ID, -- Signal from previous stage
-    i_reg_write => s_reg_write_ID, -- Signal from previous stage
+    i_mem_write => s_mem_write_ID_haz, -- Signal from previous stage
+    i_reg_write => s_reg_write_ID_haz, -- Signal from previous stage
     i_reg_read => s_reg_read_ID, -- Signal from previous stage
     i_PC_source => s_PC_source_ID, -- Signal from previous stage
     i_mem_slice => s_mem_slice_ID, -- Signal from previous stage
     i_comparison => s_comparison_ID, -- Signal from previous stage
     i_halt => s_halt_ID, -- Signal from previous stage
     i_flush_n => s_flush_n, -- Global flush signal
-    i_update => s_update_ID_EX,
+    i_update => '1',
 
     -- Data signals
     i_rd => s_rd_ID, -- Signal from previous stage

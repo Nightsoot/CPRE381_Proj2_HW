@@ -4,6 +4,11 @@ a: .word 1 2 15 7 8 12
 
 .text
 
+addi t0 t0 1
+addi t0 t0 1
+add t2 t0 t0
+
+
 addi s0, x0 1
 addi s1, x0 2
 sll t0, s0, s1 # t0 should be 4

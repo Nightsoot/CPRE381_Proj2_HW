@@ -128,6 +128,11 @@ architecture structure of RISCV_Processor is
   signal s_PC_4_WB : std_logic_vector(31 downto 0);
   signal s_PC_imm_WB : std_logic_vector(31 downto 0);
 
+
+  signal s_update_ID_EX, s_flush_IF_ID_n : std_logic;
+  signal s_PC_update : std_logic;
+  signal s_update_IF_ID : std_logic;
+
   signal s_flush_n : std_logic;
 
   component mem is
@@ -212,6 +217,8 @@ architecture structure of RISCV_Processor is
       i_negative : in std_logic;
       i_carry : in std_logic;
       i_overflow : in std_logic;
+
+      i_PC_enable : in std_logic;
       --new PC used by the program memory
       o_new_PC : out std_logic_vector(31 downto 0);
       o_PC_4 : out std_logic_vector(31 downto 0);
@@ -249,6 +256,22 @@ architecture structure of RISCV_Processor is
     );
 
   end component;
+  component hazard_detector is
+
+    port (
+      i_rs1_ID : in std_logic_vector(4 downto 0);
+      i_rs2_ID : in std_logic_vector(4 downto 0);
+      i_rd_EX : in std_logic_vector(4 downto 0);
+      i_reg_write_EX : in std_logic;
+      i_rd_MEM : in std_logic_vector(4 downto 0);
+      i_reg_write_MEM : in std_logic;
+      o_PC_update : out std_logic;
+      o_update_ID_EX : out std_logic;
+      o_flush_IF_ID_n : out std_logic;
+      o_update_IF_ID : out std_logic
+    );
+
+  end component;
 
   component IF_ID_stage is
     generic (N : integer := DATA_WIDTH);
@@ -257,6 +280,7 @@ architecture structure of RISCV_Processor is
       i_RST : in std_logic;
       i_instruction : in std_logic_vector(31 downto 0);
       i_flush_n : in std_logic;
+      i_update : in std_logic;
       i_PC_4 : in std_logic_vector(31 downto 0);
 
       i_PC : in std_logic_vector(31 downto 0);
@@ -285,6 +309,7 @@ architecture structure of RISCV_Processor is
       i_comparison : in std_logic_vector(2 downto 0);
       i_halt : in std_logic;
       i_flush_n : in std_logic;
+      i_update : in std_logic;
 
       -- Data signals
       i_rd : in std_logic_vector(4 downto 0);
@@ -499,6 +524,7 @@ begin
     i_negative => s_N,
     i_carry => s_C,
     i_overflow => s_V,
+    i_PC_enable => s_PC_update,
     o_new_PC => s_PC,
     o_PC_4 => s_PC_4_IF,
     o_PC_imm => s_PC_imm_EX
@@ -525,7 +551,8 @@ begin
     i_CLK => iCLK,
     i_RST => iRST,
     i_instruction => s_Inst_IF,
-    i_flush_n => s_flush_n,
+    i_flush_n => s_flush_IF_ID_n,
+    i_update => s_update_IF_ID,
     i_PC_4 => s_PC_4_IF,
 
     i_PC => s_PC,
@@ -536,6 +563,21 @@ begin
   );
 
   s_rd_ID <= s_Inst(11 downto 7);
+
+
+  g_hazard_detection : hazard_detector
+  port map(
+    i_rs1_ID =>  s_Inst(19 downto 15),
+    i_rs2_ID =>  s_Inst(24 downto 20),
+    i_rd_EX => s_rd_EX,
+    i_reg_write_EX => s_reg_write_EX,
+    i_rd_MEM => s_rd_MEM,
+    i_reg_write_MEM => s_reg_write_MEM,
+    o_PC_update => s_PC_update,
+    o_update_ID_EX => s_update_ID_EX,
+    o_flush_IF_ID_n => s_flush_IF_ID_n,
+    o_update_IF_ID => s_update_IF_ID
+  );
 
   ID_EX : ID_EX_stage
   port map(
@@ -554,6 +596,7 @@ begin
     i_comparison => s_comparison_ID, -- Signal from previous stage
     i_halt => s_halt_ID, -- Signal from previous stage
     i_flush_n => s_flush_n, -- Global flush signal
+    i_update => s_update_ID_EX,
 
     -- Data signals
     i_rd => s_rd_ID, -- Signal from previous stage

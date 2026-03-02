@@ -33,6 +33,7 @@ entity ID_EX_stage is
         i_halt : in std_logic;
 
         i_flush_n : in std_logic;
+        i_update : in std_logic;
 
         --control signals for later (or to be sent directly to fetch logic)
         o_ALU_src : out std_logic;
@@ -95,14 +96,17 @@ architecture structure of ID_EX_stage is
             o_Q : out std_logic); -- Data value output
 
     end component;
+
+    signal s_RST : std_logic;
 begin
 
+    s_RST <= i_RST;
     ALU_src_reg : dffg
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_ALU_src,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_ALU_src
     );
 
@@ -112,9 +116,9 @@ begin
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_ALU_control,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_ALU_control
     );
 
@@ -124,36 +128,36 @@ begin
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_result_src,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_result_src
     );
 
     mem_write_reg : dffg
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_mem_write,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_mem_write
     );
 
     reg_write_reg : dffg
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_reg_write,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_reg_write
     );
 
     reg_read_reg : dffg
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_reg_read,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_reg_read
     );
     PC_src_reg : reg_n
@@ -162,9 +166,9 @@ begin
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_PC_source,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_PC_source
     );
 
@@ -174,9 +178,9 @@ begin
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_mem_slice,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_mem_slice
     );
 
@@ -186,18 +190,18 @@ begin
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_comparison,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_comparison
     );
 
     halt_reg : dffg
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_halt,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_halt
     );
     rd_reg : reg_n
@@ -206,54 +210,54 @@ begin
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_rd,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_rd
     );
 
     rs1_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_rs1,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_rs1
     );
 
     rs2_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_rs2,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_rs2
     );
 
     imm32_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_imm32,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_imm32
     );
 
     PC_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_PC,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_PC
     );
 
     PC_4_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_PC_4,
-        i_WE => i_flush_n,
+        i_WE => i_update,
         o_Q => o_PC_4
     );
 end structure;

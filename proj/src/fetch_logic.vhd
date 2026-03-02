@@ -33,6 +33,8 @@ entity fetch_logic is
         i_negative : in std_logic;
         i_carry : in std_logic;
         i_overflow : in std_logic;
+
+        i_PC_enable : in std_logic;
         --new PC used by the program memory
         o_new_PC : out std_logic_vector(31 downto 0);
         --allows PC + 4 to be accessed for jal
@@ -83,8 +85,7 @@ begin
     port map(
         i_CLK => i_CLK,
         i_RST => i_RST,
-        --we are always writing to PC
-        i_WE => '1',
+        i_WE => i_PC_enable,
         i_D => s_PC_chosen,
         o_Q => o_new_PC
     );

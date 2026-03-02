@@ -23,6 +23,7 @@ entity IF_ID_stage is
     i_instruction : in std_logic_vector(31 downto 0);
 
     i_flush_n : in std_logic;
+    i_update : in std_logic;
     i_PC : in std_logic_vector(31 downto 0);
     o_PC : out std_logic_vector(31 downto 0);
     i_PC_4 : in std_logic_vector(31 downto 0);
@@ -52,22 +53,23 @@ architecture structure of IF_ID_stage is
 
   component dffg is
 
-        port (
-            i_CLK : in std_logic; -- Clock input
-            i_RST : in std_logic; -- Reset input
-            i_WE : in std_logic; -- Write enable input
-            i_D : in std_logic; -- Data value input
-            o_Q : out std_logic); -- Data value output
+    port (
+      i_CLK : in std_logic; -- Clock input
+      i_RST : in std_logic; -- Reset input
+      i_WE : in std_logic; -- Write enable input
+      i_D : in std_logic; -- Data value input
+      o_Q : out std_logic); -- Data value output
 
-    end component;
+  end component;
+  signal s_RST : std_logic;
 begin
-
+  s_RST <= '1' when ((i_RST = '1') or (i_flush_n = '0')) else '0';
   --result of IF buffered
   inst_reg : reg_n
   port map(
     i_CLK => i_CLK,
-    i_RST => i_RST,
-    i_WE => i_flush_n,
+    i_RST => s_RST,
+    i_WE => i_update,
     i_D => i_instruction,
     o_Q => o_instruction
   );
@@ -75,18 +77,18 @@ begin
   PC_reg : reg_n
   port map(
     i_CLK => i_CLK,
-    i_RST => i_RST,
+    i_RST => s_RST,
     i_D => i_PC,
-    i_WE => i_flush_n,
+    i_WE => i_update,
     o_Q => o_PC
   );
 
   PC_4_reg : reg_n
   port map(
     i_CLK => i_CLK,
-    i_RST => i_RST,
+    i_RST => s_RST,
     i_D => i_PC_4,
-    i_WE => i_flush_n,
+    i_WE => i_update,
     o_Q => o_PC_4
   );
 

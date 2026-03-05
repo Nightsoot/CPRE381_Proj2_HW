@@ -134,7 +134,11 @@ architecture structure of RISCV_Processor is
   signal s_flush_n : std_logic;
 
   signal s_mem_write_ID_haz, s_reg_write_ID_haz : std_logic;
+  signal s_rs1_addr_EX, s_rs2_addr_EX, s_rs2_addr_MEM : std_logic_vector(4 downto 0);
 
+  signal s_rs1_ID_true, s_rs2_ID_true, s_rs1_EX_true, s_rs2_EX_true, s_rs2_MEM_true : std_logic_vector(31 downto 0);
+  signal s_rs1_forwarded_ID, s_rs2_forwarded_ID, s_rs1_forwarded_EX, s_rs2_forwarded_EX, s_rs2_forwarded_MEM : std_logic_vector(31 downto 0);
+  signal s_forward_rs1_ID, s_forward_rs1_EX, s_forward_rs2_MEM, s_forward_rs2_EX, s_forward_rs2_ID : std_logic;
   component mem is
     generic (
       ADDR_WIDTH : integer;
@@ -268,9 +272,60 @@ architecture structure of RISCV_Processor is
       o_PC_update : out std_logic;
       o_update_ID_EX : out std_logic;
       o_flush_IF_ID_n : out std_logic;
-      o_update_IF_ID : out std_logic
+      o_update_IF_ID : out std_logic;
+      --this is at the EX stage
+      i_inst_forward_type : in std_logic_vector(1 downto 0);
+      i_ID_mem_write : in std_logic
     );
 
+  end component;
+
+  component data_forwarder is
+
+    port (
+      i_rs1_addr_ID : in std_logic_vector(4 downto 0);
+      i_rs2_addr_ID : in std_logic_vector(4 downto 0);
+      i_rs1_addr_EX : in std_logic_vector(4 downto 0);
+      i_rs2_addr_EX : in std_logic_vector(4 downto 0);
+      i_rs2_addr_MEM : in std_logic_vector(4 downto 0);
+      i_rd_EX : in std_logic_vector(4 downto 0);
+      i_rd_MEM : in std_logic_vector(4 downto 0);
+      i_rd_WB : in std_logic_vector(4 downto 0);
+      i_reg_write_EX : in std_logic;
+      i_reg_write_MEM : in std_logic;
+      i_reg_write_WB : in std_logic;
+      i_inst_type_EX : in std_logic_vector(1 downto 0);
+      i_inst_type_MEM : in std_logic_vector(1 downto 0);
+      i_inst_type_WB : in std_logic_vector(1 downto 0);
+      --data that could be forwarded
+      i_ALU_res_EX : in std_logic_vector(31 downto 0);
+      i_ALU_res_MEM : in std_logic_vector(31 downto 0);
+      i_ALU_res_WB : in std_logic_vector(31 downto 0);
+
+      i_PC_4_EX : in std_logic_vector(31 downto 0);
+      i_PC_4_MEM : in std_logic_vector(31 downto 0);
+      i_PC_4_WB : in std_logic_vector(31 downto 0);
+
+      i_PC_imm_EX : in std_logic_vector(31 downto 0);
+      i_PC_imm_MEM : in std_logic_vector(31 downto 0);
+      i_PC_imm_WB : in std_logic_vector(31 downto 0);
+
+      i_mem_res_MEM : in std_logic_vector(31 downto 0);
+      i_mem_res_WB : in std_logic_vector(31 downto 0);
+
+      --fowarded data (rs2 for MEM will not be forwarded)
+      o_rs1_ID : out std_logic_vector(31 downto 0);
+      o_forward_rs1_ID : out std_logic;
+      o_rs2_ID : out std_logic_vector(31 downto 0);
+      o_forward_rs2_ID : out std_logic;
+      o_rs1_EX : out std_logic_vector(31 downto 0);
+      o_forward_rs1_EX : out std_logic;
+      o_rs2_EX : out std_logic_vector(31 downto 0);
+      o_forward_rs2_EX : out std_logic;
+      o_rs2_MEM : out std_logic_vector(31 downto 0);
+      o_forward_rs2_MEM : out std_logic
+
+    );
   end component;
 
   component IF_ID_stage is
@@ -317,6 +372,9 @@ architecture structure of RISCV_Processor is
       i_rs2 : in std_logic_vector(31 downto 0);
       i_imm32 : in std_logic_vector(31 downto 0);
 
+      i_rs1_addr : in std_logic_vector(4 downto 0);
+      i_rs2_addr : in std_logic_vector(4 downto 0);
+
       i_PC : in std_logic_vector(31 downto 0);
       o_PC : out std_logic_vector(31 downto 0);
       i_PC_4 : in std_logic_vector(31 downto 0);
@@ -333,6 +391,10 @@ architecture structure of RISCV_Processor is
       o_mem_slice : out std_logic_vector(2 downto 0);
       o_comparison : out std_logic_vector(2 downto 0);
       o_halt : out std_logic;
+
+      o_rs1_addr : out std_logic_vector(4 downto 0);
+      o_rs2_addr : out std_logic_vector(4 downto 0);
+
       o_rd : out std_logic_vector(4 downto 0);
       o_rs1 : out std_logic_vector(31 downto 0);
       o_rs2 : out std_logic_vector(31 downto 0);
@@ -361,6 +423,8 @@ architecture structure of RISCV_Processor is
       i_rs2 : in std_logic_vector(31 downto 0);
       i_PC_4 : in std_logic_vector(31 downto 0);
 
+      i_rs2_addr : in std_logic_vector(4 downto 0);
+
       -- Outputs
       o_result_src : out std_logic_vector(1 downto 0);
       o_reg_write : out std_logic;
@@ -373,6 +437,7 @@ architecture structure of RISCV_Processor is
       o_rs2 : out std_logic_vector(31 downto 0);
       o_PC_4 : out std_logic_vector(31 downto 0);
       i_PC_imm : in std_logic_vector(31 downto 0);
+      o_rs2_addr : out std_logic_vector(4 downto 0);
       o_PC_imm : out std_logic_vector(31 downto 0)
     );
   end component;
@@ -481,8 +546,8 @@ begin
     i_write_reg => s_RegWrAddr,
     i_write_value => s_RegWrData,
     i_read_write => s_RegWr,
-    o_read_value1 => s_rs1_ID,
-    o_read_value2 => s_rs2_ID
+    o_read_value1 => s_rs1_ID_true,
+    o_read_value2 => s_rs2_ID_true
   );
   s_RegWr <= s_reg_write_WB;
 
@@ -574,8 +639,67 @@ begin
     o_PC_update => s_PC_update,
     o_update_ID_EX => s_update_ID_EX,
     o_flush_IF_ID_n => s_flush_IF_ID_n,
-    o_update_IF_ID => s_update_IF_ID
+    o_update_IF_ID => s_update_IF_ID,
+    i_inst_forward_type => s_result_src_EX,
+    i_ID_mem_write => s_mem_write_ID
   );
+
+  g_data_forward : data_forwarder
+  port map(
+    i_rs1_addr_ID => s_Inst(19 downto 15),
+    i_rs2_addr_ID => s_Inst(24 downto 20),
+    i_rs1_addr_EX => s_rs1_addr_EX,
+    i_rs2_addr_EX => s_rs2_addr_EX,
+    i_rs2_addr_MEM => s_rs2_addr_MEM,
+    i_rd_EX => s_rd_EX,
+    i_rd_MEM => s_rd_MEM,
+    i_rd_WB => s_rd_WB,
+    i_reg_write_EX => s_reg_write_EX,
+    i_reg_write_MEM => s_reg_write_MEM,
+    i_reg_write_WB => s_reg_write_WB,
+    i_inst_type_EX => s_result_src_EX,
+    i_inst_type_MEM => s_result_src_MEM,
+    i_inst_type_WB => s_result_src_WB,
+
+    --data that could be forwarded
+    i_ALU_res_EX => s_ALU_res_EX,
+    i_ALU_res_MEM => s_ALU_res_MEM,
+    i_ALU_res_WB => s_ALU_res_WB,
+
+    i_PC_4_EX => s_PC_4_EX,
+    i_PC_4_MEM => s_PC_4_MEM,
+    i_PC_4_WB => s_PC_4_WB,
+
+    i_PC_imm_EX => s_PC_imm_EX,
+    i_PC_imm_MEM => s_PC_imm_MEM,
+    i_PC_imm_WB => s_PC_imm_WB,
+
+    i_mem_res_MEM => s_mem_res_MEM,
+    i_mem_res_WB => s_mem_res_WB,
+
+    --fowarded data (rs2 for MEM will not be forwarded)
+    o_rs1_ID => s_rs1_forwarded_ID,
+    o_forward_rs1_ID => s_forward_rs1_ID,
+    o_rs2_ID => s_rs2_forwarded_ID,
+    o_forward_rs2_ID => s_forward_rs2_ID,
+    o_rs1_EX => s_rs1_forwarded_EX,
+    o_forward_rs1_EX => s_forward_rs1_EX,
+    o_rs2_EX => s_rs2_forwarded_EX,
+    o_forward_rs2_EX => s_forward_rs2_EX,
+    o_rs2_MEM => s_rs2_forwarded_MEM,
+    o_forward_rs2_MEM => s_forward_rs2_MEM
+  );
+
+  s_rs1_ID <= s_rs1_ID_true when (s_forward_rs1_ID = '0') else
+    s_rs1_forwarded_ID;
+  s_rs1_EX <= s_rs1_EX_true when (s_forward_rs1_EX = '0') else
+    s_rs1_forwarded_EX;
+  s_rs2_ID <= s_rs2_ID_true when (s_forward_rs2_ID = '0') else
+    s_rs2_forwarded_ID;
+  s_rs2_EX <= s_rs2_EX_true when (s_forward_rs2_EX = '0') else
+    s_rs2_forwarded_EX;
+  s_rs2_MEM <= s_rs2_MEM_true when (s_forward_rs2_MEM = '0') else
+    s_rs2_forwarded_MEM;
 
   --allow the "bad" instruction to pass through so hazards clear but
   --prevent it from actually doing anything (nop)
@@ -613,6 +737,12 @@ begin
     i_PC => s_PC_ID,
     o_PC => s_PC_EX,
 
+    i_rs1_addr => s_Inst(19 downto 15),
+    i_rs2_addr => s_Inst(24 downto 20),
+
+    o_rs1_addr => s_rs1_addr_EX,
+    o_rs2_addr => s_rs2_addr_EX,
+
     -- Outputs
     o_ALU_src => s_ALU_src_EX, -- Signal for EX stage
     o_ALU_control => s_ALU_control_EX, -- Signal for EX stage
@@ -625,8 +755,8 @@ begin
     o_comparison => s_comparison_EX, -- Signal for EX stage
     o_halt => s_halt_EX, -- Signal for EX stage
     o_rd => s_rd_EX, -- Signal for EX stage
-    o_rs1 => s_rs1_EX, -- Signal for EX stage
-    o_rs2 => s_rs2_EX, -- Signal for EX stage
+    o_rs1 => s_rs1_EX_true, -- Signal for EX stage
+    o_rs2 => s_rs2_EX_true, -- Signal for EX stage
     o_imm32 => s_imm32_EX -- Signal for EX stage
   );
 
@@ -647,9 +777,12 @@ begin
     i_rd => s_rd_EX, -- Signal from EX stage
     i_adder_res => s_adder_res_EX, -- Signal from EX stage
     i_ALU_res => s_ALU_res_EX, -- Signal from EX stage
-    i_rs2 => s_rs2_EX, -- Signal from EX stage
+    i_rs2 => s_rs2_EX_true, -- Signal from EX stage
     i_PC_4 => s_PC_4_EX, -- Signal from EX stage
     i_PC_imm => s_PC_imm_EX,
+
+    i_rs2_addr => s_rs2_addr_EX,
+    o_rs2_addr => s_rs2_addr_MEM,
 
     -- Outputs
     o_result_src => s_result_src_MEM, -- Signal for MEM stage

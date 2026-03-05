@@ -48,6 +48,8 @@ entity ID_EX_stage is
         o_halt : out std_logic;
 
         --this will eventually circle around to the register
+        i_rs1_addr : in std_logic_vector(4 downto 0);
+        i_rs2_addr : in std_logic_vector(4 downto 0);
         i_rd : in std_logic_vector(4 downto 0);
 
         --operands for ex stage
@@ -62,6 +64,9 @@ entity ID_EX_stage is
         o_rs1 : out std_logic_vector(31 downto 0);
         o_rs2 : out std_logic_vector(31 downto 0);
         o_imm32 : out std_logic_vector(31 downto 0);
+
+        o_rs1_addr : out std_logic_vector(4 downto 0);
+        o_rs2_addr : out std_logic_vector(4 downto 0);
 
         i_PC_4 : in std_logic_vector(31 downto 0);
         o_PC_4 : out std_logic_vector(31 downto 0);
@@ -215,6 +220,32 @@ begin
         i_WE => i_update,
         o_Q => o_rd
     );
+
+    rs1_addr_reg : reg_n
+    generic map(
+        N => 5
+    )
+    port map(
+        i_CLK => i_CLK,
+        i_RST => s_RST,
+        i_D => i_rs1_addr,
+        i_WE => i_update,
+        o_Q => o_rs1_addr
+    );
+
+
+    rs2_addr_reg : reg_n
+    generic map(
+        N => 5
+    )
+    port map(
+        i_CLK => i_CLK,
+        i_RST => s_RST,
+        i_D => i_rs2_addr,
+        i_WE => i_update,
+        o_Q => o_rs2_addr
+    );
+
 
     rs1_reg : reg_n
     port map(

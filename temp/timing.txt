@@ -1,0 +1,119 @@
+
+#
+# CprE 381 toolflow Timing dump
+#
+
+FMax: 47.80mhz Clk Constraint: 20.00ns Slack: -0.92ns
+
+The path is given below
+
+ ===================================================================
+ From Node    : MEM_WB_stage:MEM_WB|reg_n:rd_reg|dffg:\G_NBit_REG:2:REGI|s_Q
+ To Node      : fetch_logic:g_fetch_logic|reg_n:g_PC|dffg:\G_NBit_REG:1:REGI|s_Q
+ Launch Clock : iCLK
+ Latch Clock  : iCLK
+ Data Arrival Path:
+ Total (ns)  Incr (ns)     Type  Element
+ ==========  ========= ==  ====  ===================================
+      0.000      0.000           launch edge time
+      3.100      3.100  R        clock network delay
+      3.332      0.232     uTco  MEM_WB_stage:MEM_WB|reg_n:rd_reg|dffg:\G_NBit_REG:2:REGI|s_Q
+      3.332      0.000 RR  CELL  MEM_WB|rd_reg|\G_NBit_REG:2:REGI|s_Q|q
+      4.076      0.744 RR    IC  g_data_forward|Equal8~0|dataa
+      4.505      0.429 RF  CELL  g_data_forward|Equal8~0|combout
+      4.767      0.262 FF    IC  g_data_forward|s_rs1_WB_to_EX_hazard~0|datad
+      4.917      0.150 FR  CELL  g_data_forward|s_rs1_WB_to_EX_hazard~0|combout
+      5.120      0.203 RR    IC  g_data_forward|s_rs1_WB_to_EX_hazard~3|datad
+      5.275      0.155 RR  CELL  g_data_forward|s_rs1_WB_to_EX_hazard~3|combout
+      5.487      0.212 RR    IC  s_read_value1_adjusted[0]~1|datac
+      5.774      0.287 RR  CELL  s_read_value1_adjusted[0]~1|combout
+      6.423      0.649 RR    IC  s_read_value1_adjusted[0]~2|datac
+      6.710      0.287 RR  CELL  s_read_value1_adjusted[0]~2|combout
+      6.912      0.202 RR    IC  s_read_value1_adjusted[0]~3|datac
+      7.199      0.287 RR  CELL  s_read_value1_adjusted[0]~3|combout
+      7.901      0.702 RR    IC  g_ALU|g_Adder|g_Adder0|g_Or|o_F~0|datac
+      8.186      0.285 RR  CELL  g_ALU|g_Adder|g_Adder0|g_Or|o_F~0|combout
+      8.414      0.228 RR    IC  g_ALU|g_Adder|\G_NBit_adder:1:ADDERI|g_Or|o_F~0|datad
+      8.569      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:1:ADDERI|g_Or|o_F~0|combout
+      8.797      0.228 RR    IC  g_ALU|g_Adder|\G_NBit_adder:2:ADDERI|g_Or|o_F~0|datad
+      8.952      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:2:ADDERI|g_Or|o_F~0|combout
+      9.181      0.229 RR    IC  g_ALU|g_Adder|\G_NBit_adder:3:ADDERI|g_Or|o_F~0|datad
+      9.336      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:3:ADDERI|g_Or|o_F~0|combout
+      9.562      0.226 RR    IC  g_ALU|g_Adder|\G_NBit_adder:4:ADDERI|g_Or|o_F~0|datad
+      9.717      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:4:ADDERI|g_Or|o_F~0|combout
+     10.103      0.386 RR    IC  g_ALU|g_Adder|\G_NBit_adder:5:ADDERI|g_Or|o_F~0|datad
+     10.258      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:5:ADDERI|g_Or|o_F~0|combout
+     10.485      0.227 RR    IC  g_ALU|g_Adder|\G_NBit_adder:6:ADDERI|g_Or|o_F~0|datad
+     10.640      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:6:ADDERI|g_Or|o_F~0|combout
+     10.867      0.227 RR    IC  g_ALU|g_Adder|\G_NBit_adder:7:ADDERI|g_Or|o_F~0|datad
+     11.022      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:7:ADDERI|g_Or|o_F~0|combout
+     11.250      0.228 RR    IC  g_ALU|g_Adder|\G_NBit_adder:8:ADDERI|g_Or|o_F~0|datad
+     11.405      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:8:ADDERI|g_Or|o_F~0|combout
+     11.629      0.224 RR    IC  g_ALU|g_Adder|\G_NBit_adder:9:ADDERI|g_Or|o_F~0|datac
+     11.916      0.287 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:9:ADDERI|g_Or|o_F~0|combout
+     12.145      0.229 RR    IC  g_ALU|g_Adder|\G_NBit_adder:10:ADDERI|g_Or|o_F~0|datad
+     12.300      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:10:ADDERI|g_Or|o_F~0|combout
+     12.526      0.226 RR    IC  g_ALU|g_Adder|\G_NBit_adder:11:ADDERI|g_Or|o_F~0|datad
+     12.681      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:11:ADDERI|g_Or|o_F~0|combout
+     12.907      0.226 RR    IC  g_ALU|g_Adder|\G_NBit_adder:12:ADDERI|g_Or|o_F~0|datad
+     13.062      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:12:ADDERI|g_Or|o_F~0|combout
+     13.289      0.227 RR    IC  g_ALU|g_Adder|\G_NBit_adder:13:ADDERI|g_Or|o_F~0|datad
+     13.444      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:13:ADDERI|g_Or|o_F~0|combout
+     13.671      0.227 RR    IC  g_ALU|g_Adder|\G_NBit_adder:14:ADDERI|g_Or|o_F~0|datad
+     13.826      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:14:ADDERI|g_Or|o_F~0|combout
+     14.054      0.228 RR    IC  g_ALU|g_Adder|\G_NBit_adder:15:ADDERI|g_Or|o_F~0|datad
+     14.209      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:15:ADDERI|g_Or|o_F~0|combout
+     14.436      0.227 RR    IC  g_ALU|g_Adder|\G_NBit_adder:16:ADDERI|g_Or|o_F~0|datad
+     14.591      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:16:ADDERI|g_Or|o_F~0|combout
+     14.817      0.226 RR    IC  g_ALU|g_Adder|\G_NBit_adder:17:ADDERI|g_Or|o_F~0|datac
+     15.104      0.287 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:17:ADDERI|g_Or|o_F~0|combout
+     15.329      0.225 RR    IC  g_ALU|g_Adder|\G_NBit_adder:18:ADDERI|g_Or|o_F~0|datac
+     15.616      0.287 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:18:ADDERI|g_Or|o_F~0|combout
+     15.997      0.381 RR    IC  g_ALU|g_Adder|\G_NBit_adder:19:ADDERI|g_Or|o_F~0|datad
+     16.152      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:19:ADDERI|g_Or|o_F~0|combout
+     16.379      0.227 RR    IC  g_ALU|g_Adder|\G_NBit_adder:20:ADDERI|g_Or|o_F~0|datad
+     16.534      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:20:ADDERI|g_Or|o_F~0|combout
+     16.761      0.227 RR    IC  g_ALU|g_Adder|\G_NBit_adder:21:ADDERI|g_Or|o_F~0|datad
+     16.916      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:21:ADDERI|g_Or|o_F~0|combout
+     17.144      0.228 RR    IC  g_ALU|g_Adder|\G_NBit_adder:22:ADDERI|g_Or|o_F~0|datad
+     17.299      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:22:ADDERI|g_Or|o_F~0|combout
+     17.527      0.228 RR    IC  g_ALU|g_Adder|\G_NBit_adder:23:ADDERI|g_Or|o_F~0|datad
+     17.682      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:23:ADDERI|g_Or|o_F~0|combout
+     17.910      0.228 RR    IC  g_ALU|g_Adder|\G_NBit_adder:24:ADDERI|g_Or|o_F~0|datad
+     18.065      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:24:ADDERI|g_Or|o_F~0|combout
+     18.293      0.228 RR    IC  g_ALU|g_Adder|\G_NBit_adder:25:ADDERI|g_Or|o_F~0|datad
+     18.448      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:25:ADDERI|g_Or|o_F~0|combout
+     18.677      0.229 RR    IC  g_ALU|g_Adder|\G_NBit_adder:26:ADDERI|g_Or|o_F~0|datad
+     18.832      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:26:ADDERI|g_Or|o_F~0|combout
+     19.059      0.227 RR    IC  g_ALU|g_Adder|\G_NBit_adder:27:ADDERI|g_Or|o_F~0|datad
+     19.214      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:27:ADDERI|g_Or|o_F~0|combout
+     19.441      0.227 RR    IC  g_ALU|g_Adder|\G_NBit_adder:28:ADDERI|g_Or|o_F~0|datad
+     19.596      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:28:ADDERI|g_Or|o_F~0|combout
+     19.823      0.227 RR    IC  g_ALU|g_Adder|\G_NBit_adder:29:ADDERI|g_Or|o_F~0|datac
+     20.110      0.287 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:29:ADDERI|g_Or|o_F~0|combout
+     20.337      0.227 RR    IC  g_ALU|g_Adder|\G_NBit_adder:30:ADDERI|g_Or|o_F~0|datad
+     20.492      0.155 RR  CELL  g_ALU|g_Adder|\G_NBit_adder:30:ADDERI|g_Or|o_F~0|combout
+     20.717      0.225 RR    IC  g_ALU|g_Adder|g_Adder31|g_Or|o_F~0|datac
+     21.004      0.287 RR  CELL  g_ALU|g_Adder|g_Adder31|g_Or|o_F~0|combout
+     21.238      0.234 RR    IC  g_fetch_logic|s_condition_met~0|datac
+     21.505      0.267 RF  CELL  g_fetch_logic|s_condition_met~0|combout
+     21.803      0.298 FF    IC  g_fetch_logic|s_condition_met~5|dataa
+     22.207      0.404 FF  CELL  g_fetch_logic|s_condition_met~5|combout
+     23.203      0.996 FF    IC  g_fetch_logic|g_PC|\G_NBit_REG:1:REGI|s_Q~0|datac
+     23.483      0.280 FF  CELL  g_fetch_logic|g_PC|\G_NBit_REG:1:REGI|s_Q~0|combout
+     23.711      0.228 FF    IC  g_fetch_logic|g_PC|\G_NBit_REG:1:REGI|s_Q~feeder|datad
+     23.836      0.125 FF  CELL  g_fetch_logic|g_PC|\G_NBit_REG:1:REGI|s_Q~feeder|combout
+     23.836      0.000 FF    IC  g_fetch_logic|g_PC|\G_NBit_REG:1:REGI|s_Q|d
+     23.940      0.104 FF  CELL  fetch_logic:g_fetch_logic|reg_n:g_PC|dffg:\G_NBit_REG:1:REGI|s_Q
+ Data Required Path:
+ Total (ns)  Incr (ns)     Type  Element
+ ==========  ========= ==  ====  ===================================
+     20.000     20.000           latch edge time
+     22.990      2.990  R        clock network delay
+     23.022      0.032           clock pessimism removed
+     23.002     -0.020           clock uncertainty
+     23.020      0.018     uTsu  fetch_logic:g_fetch_logic|reg_n:g_PC|dffg:\G_NBit_REG:1:REGI|s_Q
+ Data Arrival Time  :    23.940
+ Data Required Time :    23.020
+ Slack              :    -0.920 (VIOLATED)
+ ===================================================================

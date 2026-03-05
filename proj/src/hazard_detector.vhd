@@ -38,7 +38,8 @@ begin
     --waiting would require MEM->EX, but in the case of sw we can wait even longer til WB -> MEM
     s_data_hazard_r2 <= '1' when(
         i_rd_EX /= "00000" and i_reg_write_EX = '1' and i_rd_EX = i_rs2_ID and i_inst_forward_type = "01" and i_ID_mem_write = '0'
-        );
+        ) else
+        '0';
     --an instruction in ID that is dependent on an instruction in EX which is load, will not do
     --if we wait a cycle we could pipe MEM -> EX but this would be bad for fmax
     s_data_hazard_r1 <= '1' when(

@@ -479,10 +479,20 @@ architecture structure of RISCV_Processor is
   signal s_N : std_logic;
   signal s_V : std_logic;
   signal s_Z : std_logic;
+
+  signal cycle : integer;
 begin
   s_Ovfl <= '0';
   s_RegWrAddr <= s_rd_WB;
   s_flush_n <= '1';
+
+  cycle_count: process (iRST, iCLK) begin
+    if(iRst = '1') then
+      cycle <= 0;
+    elsif(iCLK'event and iClk = '1') then
+      cycle <= cycle + 1;
+    end if;
+  end process cycle_count;
 
   oALUout <= s_ALU_res_WB;
 
@@ -793,7 +803,7 @@ begin
     o_rd => s_rd_MEM, -- Signal for MEM stage
     o_adder_res => s_adder_res_MEM, -- Signal for MEM stage
     o_ALU_res => s_ALU_res_MEM, -- Signal for MEM stage
-    o_rs2 => s_rs2_MEM, -- Signal for MEM stage
+    o_rs2 => s_rs2_MEM_true, -- Signal for MEM stage
     o_PC_4 => s_PC_4_MEM, -- Signal for MEM stage
     o_PC_imm => s_PC_imm_MEM
   );

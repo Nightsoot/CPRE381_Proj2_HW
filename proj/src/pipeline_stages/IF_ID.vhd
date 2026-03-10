@@ -61,23 +61,26 @@ architecture structure of IF_ID_stage is
       o_Q : out std_logic); -- Data value output
 
   end component;
-  signal s_RST : std_logic;
+  signal s_instruction : std_logic_vector(31 downto 0);
 begin
-  s_RST <= '1' when ((i_RST = '1') or (i_flush_n = '0')) else '0';
+  
+  -- Synchronously inject NOP when flush is requested
+  s_instruction <= i_instruction when i_flush_n = '1' else x"00000013";
+
   --result of IF buffered
   inst_reg : reg_n
   port map(
     i_CLK => i_CLK,
-    i_RST => s_RST,
+    i_RST => i_RST,
     i_WE => i_update,
-    i_D => i_instruction,
+    i_D => s_instruction,
     o_Q => o_instruction
   );
 
   PC_reg : reg_n
   port map(
     i_CLK => i_CLK,
-    i_RST => s_RST,
+    i_RST => i_RST,
     i_D => i_PC,
     i_WE => i_update,
     o_Q => o_PC
@@ -86,7 +89,7 @@ begin
   PC_4_reg : reg_n
   port map(
     i_CLK => i_CLK,
-    i_RST => s_RST,
+    i_RST => i_RST,
     i_D => i_PC_4,
     i_WE => i_update,
     o_Q => o_PC_4

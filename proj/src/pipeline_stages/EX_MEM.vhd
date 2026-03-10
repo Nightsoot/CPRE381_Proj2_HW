@@ -89,14 +89,25 @@ architecture structure of EX_MEM_stage is
             o_Q : out std_logic); -- Data value output
 
     end component;
+
+    signal s_RST : std_logic;
 begin
+
+    s_RST  <= '1' when(
+        i_RST = '1' or
+        i_flush_n = '0'
+        )
+        else
+        '0';
+    
+
     result_src_reg : reg_n
     generic map(
         N => 2
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_result_src,
         i_WE => i_flush_n,
         o_Q => o_result_src
@@ -105,7 +116,7 @@ begin
     mem_write_reg : dffg
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_mem_write,
         i_WE => i_flush_n,
         o_Q => o_mem_write
@@ -114,7 +125,7 @@ begin
     reg_write_reg : dffg
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_reg_write,
         i_WE => i_flush_n,
         o_Q => o_reg_write
@@ -125,7 +136,7 @@ begin
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_mem_slice,
         i_WE => i_flush_n,
         o_Q => o_mem_slice
@@ -133,7 +144,7 @@ begin
     halt_reg : dffg
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_halt,
         i_WE => i_flush_n,
         o_Q => o_halt
@@ -145,7 +156,7 @@ begin
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_rd,
         i_WE => i_flush_n,
         o_Q => o_rd
@@ -157,7 +168,7 @@ begin
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_rs2_addr,
         i_WE => i_flush_n,
         o_Q => o_rs2_addr
@@ -165,7 +176,7 @@ begin
     rs2_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_rs2,
         i_WE => i_flush_n,
         o_Q => o_rs2
@@ -174,7 +185,7 @@ begin
     ALU_res_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_ALU_res,
         i_WE => i_flush_n,
         o_Q => o_ALU_res
@@ -183,7 +194,7 @@ begin
     adder_res_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_adder_res,
         i_WE => i_flush_n,
         o_Q => o_adder_res
@@ -192,7 +203,7 @@ begin
     PC_4_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_PC_4,
         i_WE => i_flush_n,
         o_Q => o_PC_4
@@ -201,7 +212,7 @@ begin
     PC_imm_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_PC_imm,
         i_WE => i_flush_n,
         o_Q => o_PC_imm

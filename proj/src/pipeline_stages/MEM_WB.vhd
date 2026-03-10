@@ -85,9 +85,16 @@ architecture structure of MEM_WB_stage is
 
     end component;
 
-
+    signal s_RST : std_logic;
 begin
 
+    s_RST  <= '1' when(
+        i_RST = '1' or
+        i_flush_n = '0'
+        )
+        else
+        '0';
+    
 
     result_src_reg : reg_n
     generic map(
@@ -95,7 +102,7 @@ begin
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_result_src,
         i_WE => i_flush_n,
         o_Q => o_result_src
@@ -104,7 +111,7 @@ begin
     reg_write_reg : dffg
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_reg_write,
         i_WE => i_flush_n,
         o_Q => o_reg_write
@@ -113,7 +120,7 @@ begin
     halt_reg : dffg
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_halt,
         i_WE => i_flush_n,
         o_Q => o_halt
@@ -125,7 +132,7 @@ begin
     )
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_rd,
         i_WE => i_flush_n,
         o_Q => o_rd
@@ -135,7 +142,7 @@ begin
     ALU_res_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_ALU_res,
         i_WE => i_flush_n,
         o_Q => o_ALU_res
@@ -144,7 +151,7 @@ begin
     MEM_WB_res_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_mem_res,
         i_WE => i_flush_n,
         o_Q => o_mem_res
@@ -153,7 +160,7 @@ begin
     PC_4_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_PC_4,
         i_WE => i_flush_n,
         o_Q => o_PC_4
@@ -162,7 +169,7 @@ begin
     PC_imm_reg : reg_n
     port map(
         i_CLK => i_CLK,
-        i_RST => i_RST,
+        i_RST => s_RST,
         i_D => i_PC_imm,
         i_WE => i_flush_n,
         o_Q => o_PC_imm

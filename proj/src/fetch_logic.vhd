@@ -40,7 +40,9 @@ entity fetch_logic is
         --allows PC + 4 to be accessed for jal
         o_PC_4 : out std_logic_vector(31 downto 0);
         --allows PC + imm to be accessed for auipc
-        o_PC_imm : out std_logic_vector(31 downto 0)
+        o_PC_imm : out std_logic_vector(31 downto 0);
+        --indicates if regs should be flushed
+        o_branch_taken : out std_logic
     );
 
 end fetch_logic;
@@ -137,6 +139,15 @@ begin
         )
         else
         '0';
+
+    --If the condition to jump is met, flush registers
+    o_branch_taken <= '1' when (
+        (i_PC_source = "01" and s_condition_met = '1') or
+        (i_PC_source = "10")
+        )
+        else
+        '0';
+
     --Muxing the different PC sources
     --0: PC + 4
     --1: PC relative

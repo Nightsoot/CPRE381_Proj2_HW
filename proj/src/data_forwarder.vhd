@@ -52,10 +52,6 @@ entity data_forwarder is
         o_forward_rs1_ID : out std_logic;
         o_rs2_ID : out std_logic_vector(31 downto 0);
         o_forward_rs2_ID : out std_logic;
-        o_rs1_EX : out std_logic_vector(31 downto 0);
-        o_forward_rs1_EX : out std_logic;
-        o_rs2_EX : out std_logic_vector(31 downto 0);
-        o_forward_rs2_EX : out std_logic;
         o_rs2_MEM : out std_logic_vector(31 downto 0);
         o_forward_rs2_MEM : out std_logic
 
@@ -170,88 +166,7 @@ begin
         )
         else
         '0';
-
-    --NOTE: do not forward mem result from memory stage to EX otherwise fclk may suffer
-    o_rs1_EX <= i_ALU_res_MEM when(
-        (s_rs1_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "00")
-        )
-        else
-        i_PC_imm_MEM when(
-        (s_rs1_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "11")
-        )
-        else
-        i_PC_4_MEM when(
-        (s_rs1_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "10")
-        )
-        else
-        i_ALU_res_WB when(
-        (s_rs1_WB_to_EX_hazard = '1' and i_inst_type_WB = "00")
-        )
-        else
-        i_PC_imm_WB when(
-        (s_rs1_WB_to_EX_hazard = '1' and i_inst_type_WB = "11")
-        )
-        else
-        i_PC_4_WB when(
-        (s_rs1_WB_to_EX_hazard = '1' and i_inst_type_WB = "10")
-        )
-        else
-        i_mem_res_WB when(
-        (s_rs1_WB_to_EX_hazard = '1' and i_inst_type_WB = "01")
-        )
-        else
-        X"00000000";
-
-    o_forward_rs1_EX <= '1' when(
-        (s_rs1_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "00") or
-        (s_rs1_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "11") or
-        (s_rs1_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "10") or
-        --All WB -> EX can be resolved
-        (s_rs1_WB_to_EX_hazard = '1')
-        )
-        else
-        '0';
-
-    --NOTE: do not forward mem result from memory stage to EX otherwise fclk may suffer
-    o_rs2_EX <= i_ALU_res_MEM when(
-        (s_rs2_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "00")
-        )
-        else
-        i_PC_imm_MEM when(
-        (s_rs2_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "11")
-        )
-        else
-        i_PC_4_MEM when(
-        (s_rs2_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "10")
-        )
-        else
-        i_ALU_res_WB when(
-        (s_rs2_WB_to_EX_hazard = '1' and i_inst_type_WB = "00")
-        )
-        else
-        i_PC_imm_WB when(
-        (s_rs2_WB_to_EX_hazard = '1' and i_inst_type_WB = "11")
-        )
-        else
-        i_PC_4_WB when(
-        (s_rs2_WB_to_EX_hazard = '1' and i_inst_type_WB = "10")
-        )
-        else
-        i_mem_res_WB when(
-        (s_rs2_WB_to_EX_hazard = '1' and i_inst_type_WB = "01")
-        )
-        else
-        X"00000000";
-
-    o_forward_rs2_EX <= '1' when(
-        (s_rs2_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "00") or
-        (s_rs2_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "11") or
-        (s_rs2_MEM_to_EX_hazard = '1' and i_inst_type_MEM = "10") or
-        --All WB -> EX can be resolved
-        (s_rs2_WB_to_EX_hazard = '1')
-        )
-        else
-        '0';
+    
 
     o_rs2_MEM <= i_ALU_res_WB when(
         (s_WB_to_MEM_hazard = '1' and i_inst_type_WB = "00")

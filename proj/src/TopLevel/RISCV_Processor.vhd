@@ -127,10 +127,11 @@ architecture structure of RISCV_Processor is
   signal s_ALU_res_WB : std_logic_vector(31 downto 0);
   signal s_PC_4_WB : std_logic_vector(31 downto 0);
   signal s_PC_imm_WB : std_logic_vector(31 downto 0);
-  signal s_update_ID_EX, s_flush_IF_ID_n : std_logic;
+  signal s_update_ID_EX, s_flush_IF_ID_n, s_flush_IF_ID_haz_n : std_logic;
   signal s_PC_update : std_logic;
   signal s_update_IF_ID : std_logic;
 
+  signal s_branch_taken : std_logic;
   signal s_flush_n : std_logic;
 
   signal s_mem_write_ID_haz, s_reg_write_ID_haz : std_logic;
@@ -226,7 +227,8 @@ architecture structure of RISCV_Processor is
       --new PC used by the program memory
       o_new_PC : out std_logic_vector(31 downto 0);
       o_PC_4 : out std_logic_vector(31 downto 0);
-      o_PC_imm : out std_logic_vector(31 downto 0)
+      o_PC_imm : out std_logic_vector(31 downto 0);
+      o_branch_taken : out std_logic
     );
   end component;
 
@@ -318,10 +320,6 @@ architecture structure of RISCV_Processor is
       o_forward_rs1_ID : out std_logic;
       o_rs2_ID : out std_logic_vector(31 downto 0);
       o_forward_rs2_ID : out std_logic;
-      o_rs1_EX : out std_logic_vector(31 downto 0);
-      o_forward_rs1_EX : out std_logic;
-      o_rs2_EX : out std_logic_vector(31 downto 0);
-      o_forward_rs2_EX : out std_logic;
       o_rs2_MEM : out std_logic_vector(31 downto 0);
       o_forward_rs2_MEM : out std_logic
 
@@ -484,7 +482,6 @@ architecture structure of RISCV_Processor is
 begin
   s_Ovfl <= '0';
   s_RegWrAddr <= s_rd_WB;
-  s_flush_n <= '1';
 
   cycle_count: process (iRST, iCLK) begin
     if(iRst = '1') then
@@ -602,8 +599,11 @@ begin
     i_PC_enable => s_PC_update,
     o_new_PC => s_PC,
     o_PC_4 => s_PC_4_IF,
-    o_PC_imm => s_PC_imm_EX
+    o_PC_imm => s_PC_imm_EX,
+    o_branch_taken => s_branch_taken
   );
+
+  s_flush_n <= not s_branch_taken;
 
   g_mem_slice : mem_slice
   port map(
@@ -612,6 +612,8 @@ begin
     i_slice_type => s_mem_slice_MEM,
     o_data => s_mem_res_MEM
   );
+
+  s_flush_IF_ID_n <= s_flush_IF_ID_haz_n and s_flush_n;
 
   --the various different result sources
   s_RegWrData <= s_ALU_res_WB when(s_result_src_WB = "00")
@@ -648,7 +650,7 @@ begin
     i_reg_write_MEM => s_reg_write_MEM,
     o_PC_update => s_PC_update,
     o_update_ID_EX => s_update_ID_EX,
-    o_flush_IF_ID_n => s_flush_IF_ID_n,
+    o_flush_IF_ID_n => s_flush_IF_ID_haz_n,
     o_update_IF_ID => s_update_IF_ID,
     i_inst_forward_type => s_result_src_EX,
     i_ID_mem_write => s_mem_write_ID
@@ -692,22 +694,16 @@ begin
     o_forward_rs1_ID => s_forward_rs1_ID,
     o_rs2_ID => s_rs2_forwarded_ID,
     o_forward_rs2_ID => s_forward_rs2_ID,
-    o_rs1_EX => s_rs1_forwarded_EX,
-    o_forward_rs1_EX => s_forward_rs1_EX,
-    o_rs2_EX => s_rs2_forwarded_EX,
-    o_forward_rs2_EX => s_forward_rs2_EX,
     o_rs2_MEM => s_rs2_forwarded_MEM,
     o_forward_rs2_MEM => s_forward_rs2_MEM
   );
 
   s_rs1_ID <= s_rs1_ID_true when (s_forward_rs1_ID = '0') else
     s_rs1_forwarded_ID;
-  s_rs1_EX <= s_rs1_EX_true when (s_forward_rs1_EX = '0') else
-    s_rs1_forwarded_EX;
+  s_rs1_EX <= s_rs1_EX_true;
   s_rs2_ID <= s_rs2_ID_true when (s_forward_rs2_ID = '0') else
     s_rs2_forwarded_ID;
-  s_rs2_EX <= s_rs2_EX_true when (s_forward_rs2_EX = '0') else
-    s_rs2_forwarded_EX;
+  s_rs2_EX <= s_rs2_EX_true;
   s_rs2_MEM <= s_rs2_MEM_true when (s_forward_rs2_MEM = '0') else
     s_rs2_forwarded_MEM;
 
@@ -781,7 +777,7 @@ begin
     i_reg_write => s_reg_write_EX, -- Signal from EX stage
     i_mem_slice => s_mem_slice_EX, -- Signal from EX stage
     i_halt => s_halt_EX, -- Signal from EX stage
-    i_flush_n => s_flush_n, -- Global flush signal
+    i_flush_n => '1',
 
     -- Data signals
     i_rd => s_rd_EX, -- Signal from EX stage
@@ -817,7 +813,7 @@ begin
     i_result_src => s_result_src_MEM, -- Signal from MEM stage
     i_reg_write => s_reg_write_MEM, -- Signal from MEM stage
     i_halt => s_halt_MEM, -- Signal from MEM stage
-    i_flush_n => s_flush_n, -- Global flush signal
+    i_flush_n => '1',
 
     -- Data signals
     i_rd => s_rd_MEM, -- Signal from MEM stage

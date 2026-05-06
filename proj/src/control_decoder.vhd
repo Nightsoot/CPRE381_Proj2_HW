@@ -28,6 +28,7 @@ entity control_decoder is
         o_PC_source : out std_logic_vector(1 downto 0);
         o_mem_slice : out std_logic_vector(2 downto 0);
         o_comparison : out std_logic_vector(2 downto 0);
+        o_store_slice : out std_logic_vector(1 downto 0);
         o_halt : out std_logic
     );
 
@@ -48,7 +49,8 @@ begin
         (s_opcode = "0010011") or
         (s_opcode = "0000011") or
         (s_opcode = "0110111") or
-        (s_opcode = "0100011"))
+        (s_opcode = "0100011") or
+        (s_opcode = "1100111"))
         else
         '0';
 
@@ -120,7 +122,8 @@ begin
         )
         else
         "1001" when(
-        (s_opcode = "0110011" and s_funct3 = "011" and s_funct7 = "0000000")
+        (s_opcode = "0110011" and s_funct3 = "011" and s_funct7 = "0000000") or
+        (s_opcode = "0010011" and s_funct3 = "011")
         )
         else
         "0000";
@@ -290,8 +293,16 @@ begin
         else
         "000";
 
+    o_store_slice <= "01" when(
+        (s_opcode = "0100011" and s_funct3 = "000")
+        )
+        else
+        "10" when(
+        (s_opcode = "0100011" and s_funct3 = "001")
+        )
+        else
+        "00";
     --dissasembly of wfi
     o_halt <= '1' when (i_instruction = X"10500073") else
         '0';
-
 end dataflow;

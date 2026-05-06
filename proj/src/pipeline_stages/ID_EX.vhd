@@ -21,7 +21,7 @@ entity ID_EX_stage is
         i_CLK : in std_logic;
         i_RST : in std_logic;
         --control signals
-        i_ALU_src :  in std_logic;
+        i_ALU_src : in std_logic;
         i_ALU_control : in std_logic_vector(3 downto 0);
         i_result_src : in std_logic_vector(1 downto 0);
         i_mem_write : in std_logic;
@@ -56,6 +56,9 @@ entity ID_EX_stage is
         i_rs1 : in std_logic_vector(31 downto 0);
         i_rs2 : in std_logic_vector(31 downto 0);
         i_imm32 : in std_logic_vector(31 downto 0);
+
+        i_store_slice : in std_logic_vector(1 downto 0);
+        o_store_slice : out std_logic_vector(1 downto 0);
 
         --this will eventually circle around to the register
         o_rd : out std_logic_vector(4 downto 0);
@@ -115,18 +118,26 @@ architecture structure of ID_EX_stage is
 
 begin
 
-    s_ALU_src <= i_ALU_src when i_flush_n = '1' else '0';
-    s_ALU_control <= i_ALU_control when i_flush_n = '1' else (others => '0');
-    s_result_src <= i_result_src when i_flush_n = '1' else (others => '0');
-    s_mem_write <= i_mem_write when i_flush_n = '1' else '0';
-    s_reg_write <= i_reg_write when i_flush_n = '1' else '0';
-    s_reg_read <= i_reg_read when i_flush_n = '1' else '0';
-    s_PC_source <= i_PC_source when i_flush_n = '1' else (others => '0');
-    s_mem_slice <= i_mem_slice when i_flush_n = '1' else (others => '0');
-    s_comparison <= i_comparison when i_flush_n = '1' else (others => '0');
-    s_halt <= i_halt when i_flush_n = '1' else '0';
-
-    
+    s_ALU_src <= i_ALU_src when i_flush_n = '1' else
+        '0';
+    s_ALU_control <= i_ALU_control when i_flush_n = '1' else
+        (others => '0');
+    s_result_src <= i_result_src when i_flush_n = '1' else
+        (others => '0');
+    s_mem_write <= i_mem_write when i_flush_n = '1' else
+        '0';
+    s_reg_write <= i_reg_write when i_flush_n = '1' else
+        '0';
+    s_reg_read <= i_reg_read when i_flush_n = '1' else
+        '0';
+    s_PC_source <= i_PC_source when i_flush_n = '1' else
+        (others => '0');
+    s_mem_slice <= i_mem_slice when i_flush_n = '1' else
+        (others => '0');
+    s_comparison <= i_comparison when i_flush_n = '1' else
+        (others => '0');
+    s_halt <= i_halt when i_flush_n = '1' else
+        '0';
     ALU_src_reg : dffg
     port map(
         i_CLK => i_CLK,
@@ -253,8 +264,6 @@ begin
         i_WE => i_update,
         o_Q => o_rs1_addr
     );
-
-
     rs2_addr_reg : reg_n
     generic map(
         N => 5
@@ -266,8 +275,6 @@ begin
         i_WE => i_update,
         o_Q => o_rs2_addr
     );
-
-
     rs1_reg : reg_n
     port map(
         i_CLK => i_CLK,
@@ -312,4 +319,17 @@ begin
         i_WE => i_update,
         o_Q => o_PC_4
     );
+
+    store_slice_reg : reg_n
+    generic map(
+        N => 2
+    )
+    port map(
+        i_CLK => i_CLK,
+        i_RST => i_RST,
+        i_D => i_store_slice,
+        i_WE => i_update,
+        o_Q => o_store_slice
+    );
+
 end structure;

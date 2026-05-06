@@ -1,0 +1,160 @@
+Oh no...
+
+Cycle: 17
+RARS instruction number: 11	Instruction: addi x7,x7,-1
+Expected:	Register Write to Reg: 0x07 Val: 0x00000006
+Got     :	Memory Write to Addr: 0x10010001 Val: 0x00000203
+Wrote to incorrect structure
+
+Cycle: 19
+RARS instruction number: 12	Instruction: addi x5,x5,1
+Expected:	Register Write to Reg: 0x05 Val: 0x10010002
+Got     :	Register Write to Reg: 0x07 Val: 0x00000006
+Incorrect write
+
+Cycle: 20
+RARS instruction number: 14	Instruction: lb x6,0(x5)
+Expected:	Register Write to Reg: 0x06 Val: 0x0000000F
+Got     :	Register Write to Reg: 0x05 Val: 0x10010002
+Incorrect write
+
+Cycle: 24
+RARS instruction number: 15	Instruction: addi x6,x6,1
+Expected:	Register Write to Reg: 0x06 Val: 0x00000010
+Got     :	Register Write to Reg: 0x06 Val: 0x00000000
+Incorrect write
+
+Cycle: 26
+RARS instruction number: 17	Instruction: addi x7,x7,-1
+Expected:	Register Write to Reg: 0x07 Val: 0x00000005
+Got     :	Register Write to Reg: 0x06 Val: 0x00000001
+Incorrect write
+
+Cycle: 26
+RARS instruction number: 18	Instruction: addi x5,x5,1
+Expected:	Register Write to Reg: 0x05 Val: 0x10010003
+Got     :	Memory Write to Addr: 0x10010002 Val: 0x00000001
+Wrote to incorrect structure
+
+Cycle: 28
+RARS instruction number: 20	Instruction: lb x6,0(x5)
+Expected:	Register Write to Reg: 0x06 Val: 0x00000007
+Got     :	Register Write to Reg: 0x07 Val: 0x00000005
+Incorrect write
+
+Cycle: 29
+RARS instruction number: 21	Instruction: addi x6,x6,1
+Expected:	Register Write to Reg: 0x06 Val: 0x00000008
+Got     :	Register Write to Reg: 0x05 Val: 0x10010003
+Incorrect write
+
+Cycle: 33
+RARS instruction number: 23	Instruction: addi x7,x7,-1
+Expected:	Register Write to Reg: 0x07 Val: 0x00000004
+Got     :	Register Write to Reg: 0x06 Val: 0x00000000
+Incorrect write
+
+Cycle: 35
+RARS instruction number: 24	Instruction: addi x5,x5,1
+Expected:	Register Write to Reg: 0x05 Val: 0x10010004
+Got     :	Register Write to Reg: 0x06 Val: 0x00000001
+Incorrect write
+
+Cycle: 35
+RARS instruction number: 26	Instruction: lb x6,0(x5)
+Expected:	Register Write to Reg: 0x06 Val: 0x00000008
+Got     :	Memory Write to Addr: 0x10010003 Val: 0x00000001
+Wrote to incorrect structure
+
+Cycle: 37
+RARS instruction number: 27	Instruction: addi x6,x6,1
+Expected:	Register Write to Reg: 0x06 Val: 0x00000009
+Got     :	Register Write to Reg: 0x07 Val: 0x00000004
+Incorrect write
+
+Cycle: 38
+RARS instruction number: 29	Instruction: addi x7,x7,-1
+Expected:	Register Write to Reg: 0x07 Val: 0x00000003
+Got     :	Register Write to Reg: 0x05 Val: 0x10010004
+Incorrect write
+
+Cycle: 42
+RARS instruction number: 30	Instruction: addi x5,x5,1
+Expected:	Register Write to Reg: 0x05 Val: 0x10010005
+Got     :	Register Write to Reg: 0x06 Val: 0x00000008
+Incorrect write
+
+Cycle: 44
+RARS instruction number: 32	Instruction: lb x6,0(x5)
+Expected:	Register Write to Reg: 0x06 Val: 0x0000000C
+Got     :	Register Write to Reg: 0x06 Val: 0x00000009
+Incorrect write
+
+Cycle: 44
+RARS instruction number: 33	Instruction: addi x6,x6,1
+Expected:	Register Write to Reg: 0x06 Val: 0x0000000D
+Got     :	Memory Write to Addr: 0x10010004 Val: 0x00000008
+Wrote to incorrect structure
+
+Cycle: 46
+RARS instruction number: 35	Instruction: addi x7,x7,-1
+Expected:	Register Write to Reg: 0x07 Val: 0x00000002
+Got     :	Register Write to Reg: 0x07 Val: 0x00000003
+Incorrect write
+
+Cycle: 47
+RARS instruction number: 36	Instruction: addi x5,x5,1
+Expected:	Register Write to Reg: 0x05 Val: 0x10010006
+Got     :	Register Write to Reg: 0x05 Val: 0x10010005
+Incorrect write
+
+Cycle: 53
+RARS instruction number: 41	Instruction: addi x7,x7,-1
+Expected:	Register Write to Reg: 0x07 Val: 0x00000001
+Got     :	Memory Write to Addr: 0x10010005 Val: 0x00000001
+Wrote to incorrect structure
+
+Cycle: 55
+RARS instruction number: 42	Instruction: addi x5,x5,1
+Expected:	Register Write to Reg: 0x05 Val: 0x10010007
+Got     :	Register Write to Reg: 0x07 Val: 0x00000002
+Incorrect write
+
+Cycle: 56
+RARS instruction number: 44	Instruction: lb x6,0(x5)
+Expected:	Register Write to Reg: 0x06 Val: 0x00000000
+Got     :	Register Write to Reg: 0x05 Val: 0x10010006
+Incorrect write
+
+Cycle: 60
+RARS instruction number: 45	Instruction: addi x6,x6,1
+Expected:	Register Write to Reg: 0x06 Val: 0x00000001
+Got     :	Register Write to Reg: 0x06 Val: 0x00000000
+Incorrect write
+
+Cycle: 62
+RARS instruction number: 47	Instruction: addi x7,x7,-1
+Expected:	Register Write to Reg: 0x07 Val: 0x00000000
+Got     :	Register Write to Reg: 0x06 Val: 0x00000001
+Incorrect write
+
+Cycle: 62
+RARS instruction number: 48	Instruction: addi x5,x5,1
+Expected:	Register Write to Reg: 0x05 Val: 0x10010008
+Got     :	Memory Write to Addr: 0x10010006 Val: 0x00000001
+Wrote to incorrect structure
+
+Cycle: 64
+RARS instruction number: na	Instruction: na
+Expected:	Execution stopped
+Got     :	Register Write to Reg: 0x07 Val: 0x00000001
+Student execution improperly continued
+
+Almost! your processor completed the program with  25/100 allowed mismatches
+
+Helpful resources for Debugging:
+ms.trace : output from the VHDL testbench during program execution on your processor
+rars.trace : output from RARS containing expected output
+vsim.wlf: waveform file generated by processor simulation, you can display this simulation in ModelSim without resimulating your processor by hand
+
+

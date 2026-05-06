@@ -181,9 +181,25 @@ architecture structure of RISCV_Processor is
       o_reg_read : out std_logic;
       o_PC_source : out std_logic_vector(1 downto 0);
       o_mem_slice : out std_logic_vector(2 downto 0);
+      o_store_slice : out std_logic_vector(1 downto 0);
       o_comparison : out std_logic_vector(2 downto 0);
       o_halt : out std_logic
     );
+  end component;
+
+  component store_slice is
+
+    port (
+      i_memory_val : in std_logic_vector(31 downto 0);
+      i_store_half : in std_logic_vector(31 downto 0);
+      --0: NOTHING
+      --1: BYTE
+      --2: HALFWORD
+      i_slice_type : in std_logic_vector(1 downto 0);
+      i_2LSB_addr : in std_logic_vector(1 downto 0);
+      o_data : out std_logic_vector(31 downto 0)
+    );
+
   end component;
 
   component imm_gen is
@@ -390,6 +406,9 @@ architecture structure of RISCV_Processor is
       o_comparison : out std_logic_vector(2 downto 0);
       o_halt : out std_logic;
 
+      i_store_slice : in std_logic_vector(1 downto 0);
+      o_store_slice : out std_logic_vector(1 downto 0);
+
       o_rs1_addr : out std_logic_vector(4 downto 0);
       o_rs2_addr : out std_logic_vector(4 downto 0);
 
@@ -422,6 +441,9 @@ architecture structure of RISCV_Processor is
       i_PC_4 : in std_logic_vector(31 downto 0);
 
       i_rs2_addr : in std_logic_vector(4 downto 0);
+
+      i_store_slice : in std_logic_vector(1 downto 0);
+      o_store_slice : out std_logic_vector(1 downto 0);
 
       -- Outputs
       o_result_src : out std_logic_vector(1 downto 0);
@@ -479,14 +501,18 @@ architecture structure of RISCV_Processor is
   signal s_Z : std_logic;
 
   signal cycle : integer;
+
+  signal s_sliced_mem : std_logic_vector(31 downto 0);
+  signal s_store_slice_ID, s_store_slice_EX, s_store_slice_MEM : std_logic_vector(1 downto 0);
+
 begin
   s_Ovfl <= '0';
   s_RegWrAddr <= s_rd_WB;
 
-  cycle_count: process (iRST, iCLK) begin
-    if(iRst = '1') then
+  cycle_count : process (iRST, iCLK) begin
+    if (iRst = '1') then
       cycle <= 0;
-    elsif(iCLK'event and iClk = '1') then
+    elsif (iCLK'event and iClk = '1') then
       cycle <= cycle + 1;
     end if;
   end process cycle_count;
@@ -518,7 +544,21 @@ begin
     data => s_DMemData,
     we => s_DMemWr,
     q => s_DMemOut);
+
   s_DMemWr <= s_mem_write_MEM;
+
+  Gstore_slice : store_slice
+  port map(
+    i_memory_val => s_rs2_MEM,
+    i_store_half => s_DMemOut,
+    --0: NOTHING
+    --1: BYTE
+    --2: HALFWORD
+    i_slice_type => s_store_slice_MEM,
+    i_2LSB_addr => s_DMemAddr(1 downto 0),
+    o_data => s_sliced_mem
+  );
+
   -- TODO: Ensure that s_Halt is connected to an output control signal produced from decoding the Halt instruction (Opcode: 01 0100)
   -- TODO: Ensure that s_Ovfl is connected to the overflow output of your ALU
 
@@ -536,6 +576,7 @@ begin
     o_PC_source => s_PC_source_ID,
     o_mem_slice => s_mem_slice_ID,
     o_comparison => s_comparison_ID,
+    o_store_slice => s_store_slice_ID,
     o_halt => s_Halt_ID
   );
   g_imm_gen : imm_gen
@@ -580,7 +621,8 @@ begin
   );
 
   s_DMemAddr <= s_adder_res_MEM;
-  s_DMemData <= s_rs2_MEM;
+  s_DMemData <= s_rs2_MEM when(s_store_slice_MEM = "00") else
+    s_sliced_mem;
 
   g_fetch_logic : fetch_logic
   port map(
@@ -749,7 +791,9 @@ begin
     o_rs1_addr => s_rs1_addr_EX,
     o_rs2_addr => s_rs2_addr_EX,
 
+    i_store_slice => s_store_slice_ID,
     -- Outputs
+    o_store_slice => s_store_slice_EX,
     o_ALU_src => s_ALU_src_EX, -- Signal for EX stage
     o_ALU_control => s_ALU_control_EX, -- Signal for EX stage
     o_result_src => s_result_src_EX, -- Signal for EX stage
@@ -789,6 +833,9 @@ begin
 
     i_rs2_addr => s_rs2_addr_EX,
     o_rs2_addr => s_rs2_addr_MEM,
+
+    i_store_slice => s_store_slice_EX,
+    o_store_slice => s_store_slice_MEM,
 
     -- Outputs
     o_result_src => s_result_src_MEM, -- Signal for MEM stage

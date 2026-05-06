@@ -49,7 +49,8 @@ begin
         else
         i_data(31 downto 24);
 
-    s_half <= i_data(15 downto 0) when (i_add_2LSB = "00") else i_data(31 downto 16);
+    s_half <= i_data(15 downto 0) when (i_add_2LSB = "00") else
+        i_data(31 downto 16);
 
     o_data <= i_data when(
         i_slice_type = "000"

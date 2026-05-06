@@ -39,6 +39,9 @@ entity EX_MEM_stage is
         i_rs2_addr : in std_logic_vector(4 downto 0);
         o_rs2_addr : out std_logic_vector(4 downto 0);
 
+        i_store_slice : in std_logic_vector(1 downto 0);
+        o_store_slice : out std_logic_vector(1 downto 0);
+
         --operands for ex stage
         i_adder_res : in std_logic_vector(31 downto 0);
         i_ALU_res : in std_logic_vector(31 downto 0);
@@ -93,14 +96,12 @@ architecture structure of EX_MEM_stage is
     signal s_RST : std_logic;
 begin
 
-    s_RST  <= '1' when(
+    s_RST <= '1' when(
         i_RST = '1' or
         i_flush_n = '0'
         )
         else
         '0';
-    
-
     result_src_reg : reg_n
     generic map(
         N => 2
@@ -218,4 +219,15 @@ begin
         o_Q => o_PC_imm
     );
 
+    store_slice_reg : reg_n
+    generic map(
+        N => 2
+    )
+    port map(
+        i_CLK => i_CLK,
+        i_RST => i_RST,
+        i_D => i_store_slice,
+        i_WE => i_flush_n,
+        o_Q => o_store_slice
+    );
 end structure;
